@@ -1,6 +1,6 @@
 {
   "name": "vesac",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "lint": "eslint --ext .js ./"
   },
@@ -23,6 +23,7 @@
     ]
   },
   "dependencies": {
+    "chalk": "^2.4.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1"

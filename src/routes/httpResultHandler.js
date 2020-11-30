@@ -2,6 +2,7 @@ const logger = require("../helpers/logger");
 const { symbols } = require("../globals/codes");
 const registry = require("../globals/registry");
 const httpStatus = require("./httpStatus");
+const addRouteContext = require("./addRouteContext");
 
 const getErrorMessage = error => {
   const or = (val, placeholder) => {
@@ -45,7 +46,7 @@ const throwResult = (result, req, res) => {
 
 const httpResultHandler = func => (req, res) => {
   try {
-    const result = func(req);
+    const result = addRouteContext(req, func);
     if (result.then && result.catch) {
       // Handle it as a promise
       result

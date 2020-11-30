@@ -1,23 +1,23 @@
 # VESAC
 
-Vesac enhancement wrapper around [Express.Js](https://www.npmjs.com/package/express).
+Vesac is an enhancement wrapper around [Express.Js](https://www.npmjs.com/package/express).
 
-I often have common functionalities in my projects, 
+I often have common functionalities in my projects,
 I'm always copy-pasting files from one project to another.
 Vesac aim to be the central point of these projects,
 containing code that I often need and re-use.
 
-⛔️ This project will probably not meet your needs or code quality requirements. I mostly develop it for myself. Btw, if you think you could help to improve it, or make it more suitable for people, do not hesitate to get in touch ☺️
+⛔️ This project will probably not meet your needs or code quality requirements. I mostly develop it for myself. Btw, if you think you could help to improve it, or make it more suitable for people, do not hesitate to get in touch.️
 
 Functionalities goal :
 
 - [x] HTTP result/error handler
+- [x] Internationalisation
+- [ ] Auth with JWT
+- [ ] References data
 - [ ] Validations
 - [ ] Permissions
-- [ ] Auth with JWT
-- [ ] Internationalisation
 - [ ] Helpers for DB model
-- [ ] Reference data
 - [ ] Error loging
 - [ ] Error reporting
 
