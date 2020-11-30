@@ -1,4 +1,4 @@
-const vesac = require("../src");
+const vesac = require("../index");
 
 vesac.configure({ hideSensibleErrors: false });
 
