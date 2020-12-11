@@ -3,6 +3,7 @@ const { symbols } = require("../globals/codes");
 const registry = require("../globals/registry");
 const httpStatus = require("./httpStatus");
 const addRouteContext = require("./addRouteContext");
+const auth = require("./auth");
 
 const getErrorMessage = error => {
   const or = (val, placeholder) => {
@@ -24,12 +25,15 @@ const getErrorMessage = error => {
 
 const throwError = (error, req, res) => {
   let usableError = error;
-  if (typeof error !== "object" || !error[symbols.HTTP_RESULT]) {
+  if (!error || typeof error !== "object" || !error[symbols.HTTP_RESULT]) {
     logger.warn(
       `Error received is not an HTTP_STATUS sending default 500. Route : ${req.originalUrl}`,
     );
-    usableError = httpStatus.internalServerError(error.message);
+    usableError = httpStatus.internalServerError[symbols.INTERNALS.NO_THROW](
+      error && error.message,
+    );
   }
+  logger.inf(error);
   res.status(usableError.status).send(getErrorMessage(usableError));
 };
 
@@ -44,18 +48,22 @@ const throwResult = (result, req, res) => {
   }
 };
 
-const httpResultHandler = func => (req, res) => {
+const httpResultHandler = (func, isProtected) => (req, res) => {
   try {
-    const result = addRouteContext(req, func);
-    if (result.then && result.catch) {
-      // Handle it as a promise
-      result
-        .then(r => throwResult(r, req, res))
-        .catch(r => throwError(r, req, res));
-    } else {
-      // Handle it as a sync result
-      throwResult(result, req, res);
-    }
+    (isProtected ? auth.checkAuthOnRequest(req) : Promise.resolve(null))
+      .then(authData => {
+        const result = addRouteContext(req, func, authData);
+        if (result.then && result.catch) {
+          // Handle it as a promise
+          result
+            .then(r => throwResult(r, req, res))
+            .catch(r => throwError(r, req, res));
+        } else {
+          // Handle it as a sync result
+          throwResult(result, req, res);
+        }
+      })
+      .catch(r => throwError(r, req, res));
   } catch (error) {
     throwError(error, req, res);
   }

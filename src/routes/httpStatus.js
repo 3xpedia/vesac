@@ -17,7 +17,7 @@ class HttpError extends Error {
       Error.captureStackTrace(this, HttpError);
     }
 
-    this.message = message;
+    this.message = message || placeholder;
     this.status = status;
     this.placeholder = placeholder;
     this.isSensible = isSensible;
@@ -25,8 +25,16 @@ class HttpError extends Error {
   }
 }
 
-const failureHttpStatus = (status, placeHolder, isSensible) => payload => {
-  throw new HttpError(status, payload, placeHolder, isSensible);
+const failureHttpStatus = (status, placeHolder, isSensible) => {
+  const factory = payload => {
+    throw new HttpError(status, payload, placeHolder, isSensible);
+  };
+  Object.defineProperty(factory, symbols.INTERNALS.NO_THROW, {
+    value: payload => new HttpError(status, payload, placeHolder, isSensible),
+    enumerable: false,
+    writable: false,
+  });
+  return factory;
 };
 
 const ok = successHttpStatus(200, "Ok");

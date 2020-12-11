@@ -13,7 +13,7 @@ Functionalities goal :
 
 - [x] HTTP result/error handler
 - [x] Internationalisation
-- [ ] Auth with JWT
+- [x] Auth with JWT
 - [ ] References data
 - [ ] Validations
 - [ ] Permissions
@@ -29,6 +29,7 @@ Functionalities goal :
 - [Configure vesac](#configure-vesac)
 - [Routing](#routing)
 - [Internationalisation](#internationalisation)
+- [JWT Auth](#jwt-auth)
 
 ## Install
 
@@ -232,3 +233,55 @@ vesac.get("/admin", ctx =>
   vesac.httpStatus.ok(ctx.i("admin", "welcome_admin")),
 );
 ```
+
+## JWT Auth
+
+```javascript
+vesac.configure({
+  authHandler: (ctx) => {...},
+  authSecret: "<AUTH_SECRET>",
+  authPath: "/route",
+  authExpiration: "2d",
+});
+```
+
+To enable the auth system, you need to provide at least `authHandler` and `authSecret` to configure.
+
+### `authHandler`
+
+A function that is called when a user try to authenticate. It receives the usual vesac context and should return a promise.
+
+If the promise is resolved, auth is successful and a token is sent to the user with the content (should be an object) returned by the promise.
+
+If the promise is rejected, the auth fail and an error (401 Invalid Auth) is sent to the client.
+
+### `authSecret`
+
+The secret to use for the JWT token creation (see [RFC 7519](https://tools.ietf.org/html/rfc7519) for details).
+
+### `authPath`
+
+The path on wich vesac will expose the auth route. On a client stand-point, this route need to be called with a POST request.
+The request is passed throuth a vesac context to the authHandler method.
+
+The default route is `/auth`
+
+### `authExpiration`
+
+The validity time of the token (see [ms](https://github.com/vercel/ms))
+
+### routing with auth
+
+```javascript
+vesac.get("/secure", ctx => vesac.httpStatus.ok(ctx.authorized));
+
+vesac.get.unprotected("/unsecure", ctx =>
+  vesac.httpStatus.ok(/* ctx.authorized is null here */),
+);
+```
+
+When auth is enabled, every route of the app is protected, the client need to provides a valid token to access it.
+
+In a route, the authed user can be accessed via the context under the key `authorized`.
+
+You can disable auth for a route by using the sub-function `unprotected` (`vesac.get.unprotected`, `vesac.post.unprotected`, `vesac.put.unprotected`, `vesac.del.unprotected`) in this case, ctx.authorized will be null;
