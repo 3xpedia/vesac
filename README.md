@@ -1,3 +1,5 @@
+/!\ This is an old, unfinished project. Please ignore this repo /!\
+
 # VESAC
 
 Vesac is an enhancement wrapper around [Express.Js](https://www.npmjs.com/package/express)
